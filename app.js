@@ -6,6 +6,7 @@ var morgan = require('morgan')
 
 
 const routes = require('./routes/index');
+const mongo = require('./mondodb')
 
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 
@@ -27,4 +28,6 @@ app.use((req, res, next)=>{
 app.use(routes);
 
 
-app.listen(80, ()=> console.log("listening"));
+app.listen(3000, ()=> console.log("listening"));
+
+mongo.run().catch(console.dir);
