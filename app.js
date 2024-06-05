@@ -28,6 +28,6 @@ app.use((req, res, next)=>{
 app.use(routes);
 
 
-app.listen(3000, ()=> console.log("listening"));
+app.listen(80, ()=> console.log("listening"));
 
 mongo.run().catch(console.dir);
