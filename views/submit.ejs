@@ -56,7 +56,7 @@
                 code: formData.get('code')
             };
 
-            fetch('/submit', {
+            fetch(`/submit?problem=${data.problemNumber}&language=${data.language}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
