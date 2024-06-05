@@ -1,10 +1,9 @@
 const mongo = require('../mondodb');
 
-const { MongoClient, ObjectId } = require('mongodb');
 
 async function getData(Id) {
     let res = undefined;
-    const client = mongo.client;
+    const client = mongo.client();
     try {
         // Connect the client to the server
         await client.connect();

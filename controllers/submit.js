@@ -28,15 +28,16 @@ function getCurrentTimestamp() {
 
 async function sendData(body) {
     res = undefined
+    const client = mongo.client()
     try {
         // Connect the client to the server
-        await mongo.client.connect();
+        await client.connect();
         console.log("Connected to MongoDB");
     
         // Define the document to be inserted
         const doc = { language: body.language, problem: body.problemNumber,timestamp:getCurrentTimestamp(), hash:getRandomHashcode(), status:getRandomStatus()  };
         // Get the database and collection
-        const database = mongo.client.db("up");
+        const database = client.db("up");
         const collection = database.collection("submissions");
         
         // Insert the document
@@ -47,7 +48,7 @@ async function sendData(body) {
         console.error("Error inserting document: ", error);
       } finally {
         // Close the client connection
-        await mongo.client.close();
+        await client.close();
       }
       return res
 }
