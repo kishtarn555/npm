@@ -1,0 +1,166 @@
+
+
+@top Script {
+    StartProgram functionList?   Execution EndProgram
+}
+
+functionList {
+    (Function | Prototype) +
+}
+
+
+Function {
+    Define Identifier As expression | Define Identifier "(" Identifier ")"As expression ";"
+}
+
+Prototype {
+    Prototipo Identifier ";"
+}
+
+Execution {
+    StartExecution expressionList EndExecution
+}
+
+
+whileStatement {
+    While boolStatement Do
+    expression
+}
+
+iterateStatement {
+    Iterate  numberStatement  Times
+    expression
+}
+
+ifStatement {
+    If boolStatement Then expression (!sino Else expression)?
+    
+}
+
+Block {
+     Begin End | Begin expressionList End
+}
+
+expression {
+    call |  whileStatement | iterateStatement | ifStatement |
+    Block
+}
+
+expressionList {
+    expression | expressionList ";"  expression?
+}
+
+
+call {
+    BuiltIn | Identifier | Identifier "(" numberStatement ")"
+}
+
+numberStatement { Number | Identifier| numberFunction }
+
+numberFunction {(Succ | Pred)"(" numberStatement ")" }
+
+Succ { @specialize<Identifier, "sucede"> }
+Pred { @specialize<Identifier, "precede"> }
+
+@precedence { sino,binaryLogic @left}
+
+boolStatement { clause | boolStatement !binaryLogic binaryOperator boolStatement  | Not boolStatement }
+clause { IFZ | BoolFunc | "(" boolStatement ")"}
+IFZ {
+    Ifzero "(" numberStatement ")"
+}
+
+BuiltIn {
+    @specialize<Identifier, "avanza"> |
+    @specialize<Identifier, "gira-izquierda"> |
+    @specialize<Identifier, "deja-zumbador"> |
+    @specialize<Identifier, "coge-zumbador"> |
+    @specialize<Identifier, "apagate">
+}
+
+BoolFunc {
+    @specialize<Identifier, "junto-a-zumbador"> |
+    @specialize<Identifier, "no-junto-a-zumbador"> |
+    @specialize<Identifier, "frente-libre"> |
+    @specialize<Identifier, "izquierda-libre"> |
+    @specialize<Identifier, "derecha-libre"> |
+    @specialize<Identifier, "frente-bloqueado"> |
+    @specialize<Identifier, "izquierda-bloqueada"> |
+    @specialize<Identifier, "derecha-bloqueada"> |
+    @specialize<Identifier, "orientado-al-norte"> |
+    @specialize<Identifier, "orientado-al-sur"> |
+    @specialize<Identifier, "orientado-al-este"> |
+    @specialize<Identifier, "orientado-al-oeste"> |
+    @specialize<Identifier, "no-orientado-al-norte"> |
+    @specialize<Identifier, "no-orientado-al-sur"> |
+    @specialize<Identifier, "no-orientado-al-este"> |
+    @specialize<Identifier, "no-orientado-al-oeste"> |
+    @specialize<Identifier, "algun-zumbador-en-la-mochila"> |    
+    @specialize<Identifier, "ningun-zumbador-en-la-mochila">
+}
+
+binaryOperator {Or | And}
+
+Begin[closedBy="End"] {
+    start
+}
+
+End[openedBy="Begin"] {
+    end
+}
+
+
+
+While { @specialize<Identifier, "mientras"> }
+Do { @specialize<Identifier, "hacer"> }
+Then { @specialize<Identifier, "entonces"> }
+Times { @specialize<Identifier, "veces"> }
+If { @specialize<Identifier, "si"> }
+Else { @specialize<Identifier, "sino"> |  @specialize<Identifier, "si-no"> }
+As { @specialize<Identifier, "como">}
+Iterate { @specialize<Identifier, "repetir"> }
+start { @specialize<Identifier, "inicio"> }
+end { @specialize<Identifier, "fin"> }
+StartProgram { @specialize<Identifier, "iniciar-programa"> }
+EndProgram { @specialize<Identifier, "finalizar-programa"> }
+StartExecution { @specialize<Identifier, "inicia-ejecucion"> }
+EndExecution { @specialize<Identifier, "termina-ejecucion"> }
+Ifzero { @specialize<Identifier, "si-es-cero"> }
+Define { @specialize<Identifier, "define-nueva-instruccion"> }
+Prototipo { @specialize<Identifier, "define-prototipo-instruccion"> }
+
+And { @specialize<Identifier, "y"> }
+Not { @specialize<Identifier, "no"> }
+Or { @specialize<Identifier, "o"> }
+
+@tokens {
+    space { @whitespace+ }
+    Identifier { $[A-Za-zÀ-ÖØ-öø-ÿ_]$[A-Za-zÀ-ÖØ-öø-ÿ0-9_-]*}
+    Number { $[0-9]+}
+}
+
+
+
+
+@skip {space | BlockComment | BlockComment2 }
+
+@skip { } {
+  BlockComment { "{" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
+}
+
+@local tokens {
+  blockCommentEnd { "}" }
+  blockCommentNewline { "\n" }
+  @else blockCommentContent
+}
+
+
+@skip { } {
+  BlockComment2 { "(*" (blockCommentContent2 | blockCommentNewline2)* blockCommentEnd2 }
+}
+
+@local tokens {
+  blockCommentEnd2 { "*)" }
+  blockCommentNewline2 { "\n" }
+  @else blockCommentContent2
+}

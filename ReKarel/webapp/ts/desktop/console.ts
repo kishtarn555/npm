@@ -1,0 +1,76 @@
+export type ConsoleTab = {
+    console:JQuery,
+    clear: JQuery,
+    parent: JQuery,
+    consoleMessageCount: JQuery,
+    tab: JQuery,
+}
+
+
+export class KarelConsole {
+    consoleTab:ConsoleTab
+    private unreadMessages;
+
+    constructor (data:ConsoleTab) {
+        this.consoleTab = data;
+        this.consoleTab.clear.on("click", ()=> this.ClearConsole());
+        this.unreadMessages = 0;
+        this.consoleTab.tab.on("show.bs.tab", ()=> {
+            console.log("???");
+            this.unreadMessages = 0;
+            this.UpdateUnreadPill();
+        })
+
+    }
+
+    SendMessageToConsole(message: string, style:string) {
+        if (!this.IsShown()) {
+            this.unreadMessages++;
+        } else {
+            this.unreadMessages = 0;
+        }
+
+        this.UpdateUnreadPill();
+
+        if (style !== "raw") {
+            const currentDate = new Date();
+            const hour = currentDate.getHours() % 12 || 12;
+            const minute = currentDate.getMinutes();
+            const second = currentDate.getSeconds();
+            const amOrPm = currentDate.getHours() < 12 ? "AM" : "PM";
+            
+            const html = `<div style="text-wrap: wrap;"><span class="text-${style}">[${hour}:${minute}:${second} ${amOrPm}]</span> ${message}</div>`;
+            this.consoleTab.console.prepend(html);
+            this.ScrollToBottom();
+            return;
+        }
+        const html = `<div>${message}</div>`;
+        this.consoleTab.console.prepend(html);
+        this.ScrollToBottom();
+        
+    }
+
+    
+    
+    ClearConsole() {
+        this.unreadMessages = 0;
+        this.UpdateUnreadPill();
+        this.consoleTab.console.empty();
+    } 
+
+    private UpdateUnreadPill() {
+        this.consoleTab.consoleMessageCount.text(this.unreadMessages);
+    }
+
+    private IsShown() {
+        return this.consoleTab.console.is(":hidden") === false;
+    }
+    private ScrollToBottom() {
+        if (this.IsShown()) {
+            this.consoleTab.parent.scrollTop(
+                this.consoleTab.parent.prop("scrollHeight")
+            );
+        }
+    }
+
+}

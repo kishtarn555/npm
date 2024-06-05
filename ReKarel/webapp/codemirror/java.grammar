@@ -1,0 +1,163 @@
+@top Script  {
+    Class ProgramClass ScriptBlock
+}
+
+
+ScriptBlock {
+    Start inner End
+}
+
+inner {
+    Function* main
+}
+
+Function {
+    Define Identifier "("Identifier?")" Block 
+}
+
+main {
+    ProgramMain "(" ")" Block
+
+}
+
+Block {
+    Start InnerBlock End
+}
+
+InnerBlock {
+    expression*
+}
+
+expression {
+    call | Block | whileStatement | iterateStatement | ifStatement
+}
+
+call {
+    (BuiltIn | Identifier) "("numberStatement?")"
+}
+
+
+BuiltIn {
+    @specialize<Identifier, "move"> |
+    @specialize<Identifier, "turnleft"> |
+    @specialize<Identifier, "putbeeper"> |
+    @specialize<Identifier, "pickbeeper"> |
+    @specialize<Identifier, "turnoff">
+}
+
+BooleanHeader {
+     "(" booleanStatement ")"
+}
+whileStatement {
+    While BooleanHeader expression
+}
+
+iterateStatement {
+    Iterate "(" numberStatement ")" expression
+}
+
+@precedence {
+    binaryLogic @left,
+    else,
+    expression
+
+}
+
+
+
+ifStatement {
+    If BooleanHeader expression (!else elseStatement)?
+    
+}
+
+elseStatement {
+    Else expression
+}
+
+
+
+booleanStatement {
+    clause |  booleanStatement !binaryLogic binaryOperator booleanStatement  | Not booleanStatement 
+}
+
+binaryOperator {
+    Or | And
+}
+
+Or { "||" }
+And { "&&" }
+Not { "!" }
+
+clause { IFZ | BoolFunc ("(" ")")? | Identifier | "(" booleanStatement ")"}
+
+BoolFunc {
+    @specialize<Identifier, "nextToABeeper"> |
+    @specialize<Identifier, "notNextToABeeper"> |
+    @specialize<Identifier, "frontIsClear"> |
+    @specialize<Identifier, "leftIsClear"> |
+    @specialize<Identifier, "rightIsClear"> |
+    @specialize<Identifier, "frontIsBlocked"> |
+    @specialize<Identifier, "leftIsBlocked"> |
+    @specialize<Identifier, "rightIsBlocked"> |
+    @specialize<Identifier, "facingNorth"> |
+    @specialize<Identifier, "facingSouth"> |
+    @specialize<Identifier, "facingEast"> |
+    @specialize<Identifier, "facingWest"> |
+    @specialize<Identifier, "notFacingNorth"> |
+    @specialize<Identifier, "notFacingSouth"> |
+    @specialize<Identifier, "notFacingEast"> |
+    @specialize<Identifier, "notFacingWest"> |
+    @specialize<Identifier, "anyBeepersInBeeperBag"> |    
+    @specialize<Identifier, "noBeepersInBeeperBag">
+}
+
+IFZ {
+    Ifzero { @specialize<Identifier, "iszero">  } "(" numberStatement ")"
+}
+
+numberStatement {
+    Number
+}
+
+Start[closedBy="End"] {
+    start
+}
+
+End[openedBy="Start"] {
+    end
+}
+
+ProgramClass { program }
+ProgramMain { program }
+
+
+While { @specialize<Identifier, "while"> }
+If { @specialize<Identifier, "if"> }
+Else { @specialize<Identifier, "else"> }
+Iterate { @specialize<Identifier, "iterate"> }
+
+@tokens {
+  space { @whitespace+ }
+  Comment { "//" ![\n]* }
+  Class { "class" }
+  program { "program" }
+  Identifier { $[a-zA-Z]$[a-zA-Z0-9_]*}
+  Number { $[0-9]+ }
+  Define { "define"|"void" }
+  start { "{" }
+  end { "}" }
+
+
+}
+
+@skip { space | Comment | BlockComment }
+@skip { } {
+  BlockComment { "/*" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
+}
+
+@local tokens {
+  blockCommentEnd { "*/" }
+  blockCommentNewline { "\n" }
+  @else blockCommentContent
+}
+
