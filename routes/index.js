@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const sendData = require('../controllers/submit')
 const getData = require('../controllers/problem')
+const path = require('path')
 
 router.get('/',(req, res, next)=> {
     res.render('home')
@@ -39,6 +40,11 @@ router.post('/submit', (req, res) => {
             res.send(sol)
         }
     );
+});
+
+router.get('/log', (req, res) => {
+    
+    res.sendFile(path.join(__dirname, '../access.log'))
 });
 
 module.exports = router;
