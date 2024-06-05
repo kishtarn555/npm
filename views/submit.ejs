@@ -13,7 +13,7 @@
 
     <div class="container mt-5">
         <h2 class="mb-4">Code Submission Form</h2>
-        <form action="/submit" method="post">
+        <form id="submissionForm">
             <div class="form-group">
                 <label for="problemNumber">Número de Problema</label>
                 <input type="text" class="form-control" id="problemNumber" name="problemNumber" required>
@@ -32,11 +32,52 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         
+        <!-- Bootstrap toast -->
+        <div class="toast" id="statusToast" data-delay="5000" style="position: absolute; top: 20px; right: 20px;">
+            <div class="toast-header">
+                <strong class="mr-auto">Submission Status</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+            </div>
+            <div class="toast-body" id="statusMessage"></div>
+        </div>
     </div>
 
     <!-- Bootstrap JS and dependencies CDN -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('submissionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const data = {
+                problemNumber: formData.get('problemNumber'),
+                language: formData.get('language'),
+                code: formData.get('code')
+            };
+
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    document.getElementById('statusMessage').textContent = `Status: ${data.status} (${data.hash})`;
+                    $('#statusToast').toast('show');
+                } else {
+                    document.getElementById('statusMessage').textContent = `Error: ${data.error}`;
+                    $('#statusToast').toast('show');
+                }
+            })
+            .catch(error => {
+                document.getElementById('statusMessage').textContent = `Error: ${error}`;
+                $('#statusToast').toast('show');
+            });
+        });
+    </script>
 </body>
 </html>

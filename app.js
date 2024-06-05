@@ -3,6 +3,7 @@ const path = require('path')
 const app = express();
 var fs = require('fs')
 var morgan = require('morgan')
+const bodyParser = require('body-parser');
 
 
 const routes = require('./routes/index');
@@ -11,6 +12,7 @@ const mongo = require('./mondodb')
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 
 // app.set('port', process.env.PORT || 3000);
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
